@@ -6,6 +6,7 @@ const Userschema = mongoose.Schema(
     surname: String,
     email: String,
     password: String,
+    isAdmin: Boolean,
     isPublic: Boolean,
     posts: [{ imgSRC: String, title: String }],
     followers: Array,
