@@ -1,4 +1,5 @@
 const User = require("../models/UserModel");
+const jwt = require("jsonwebtoken");
 
 // GET ALL USER
 const getAllUsers = async (req, res) => {
@@ -8,13 +9,63 @@ const getAllUsers = async (req, res) => {
   console.log("GET ALL USER");
 };
 
+// !login
+// LOGIN USER
+const login = async (req, res) => {
+  const user = new User(req.body);
+
+  // ?token
+  console.log("USERRR", req.body);
+  const token = jwt.sign(
+    { username: user.username, password: user.password },
+    process.env.SECRET_TOKEN
+    // {
+    // expiresIn: '1h',
+    // }
+  );
+  console.log("TOKEN", token);
+  // ?token
+
+  const validUsername = await User.findOne({ username: user.username });
+
+  const validPassword = await User.findOne({ password: user.password });
+
+  try {
+    if (validUsername && validPassword) {
+      res.status(222).send("Welcome!");
+    } else {
+      res.status(221).send("Login failed..");
+    }
+  } catch (error) {
+    alert("limon", error);
+  }
+};
+// !login
+
 // POST USER
 const postUser = async (req, res) => {
   const newUser = new User(req.body);
-  newUser.save();
 
-  console.log("POST USER");
-  // console.log(req.body);
+  const validUsername = await User.findOne({ username: newUser.username });
+
+  const validEmail = await User.findOne({ email: newUser.email });
+
+  try {
+    if (validUsername) {
+      res.status(200).send("there is already user with this Username");
+    }
+
+    if (validEmail) {
+      res.status(201).send("there is already user with this Email");
+    } else {
+      newUser.save();
+      console.log("POST USER");
+
+      res.status(203).send("Successful Registration!");
+    }
+  } catch (error) {
+    alert("limon", error);
+  }
 };
 
 // DELETE USER
@@ -54,4 +105,5 @@ module.exports = {
   getUserById,
   getUpdateUser,
   putUser,
+  login,
 };
